@@ -18,6 +18,7 @@
 #include "tlc5940.h"
 #include "serial.h"
 #include "timer.h"
+#include "adc.h"
 #include "../pgmspace.h"
 #include "../cube.h"
 #include "../effects.h"
@@ -48,6 +49,8 @@ typedef struct {
 uint8_t mode = MODE_IDLE; // Starting with no operation on.
 const effect_t *effect; // Current effect. Note: points to PGM
 
+uint16_t adc_value;
+
 // Private functions
 void process_cmd(void);
 void send_escaped(uint8_t byte);
@@ -65,6 +68,8 @@ int main() {
 	init_effect_timer();
 
 	initUSART();
+
+	adc_init();
 	sei();
 
 	// Greet the serial user
@@ -73,8 +78,7 @@ int main() {
 
 	while(1) {
 		if(serial_available()) {
-			uint8_t cmd = serial_read();
-
+				uint8_t cmd = serial_read();
 			if (cmd == ESCAPE) process_cmd();
 			else dislike(RESP_JUNK_CHAR,cmd);
 		}
@@ -82,6 +86,13 @@ int main() {
 		switch (mode) {
 		case MODE_IDLE:
 			// No operation
+
+			pin_high(DEBUG_LED);
+			adc_value = adc_read(0);
+			pin_low(DEBUG_LED);
+
+			serial_send((uint8_t)(adc_value>>8));
+			serial_send((uint8_t)adc_value);
 			break;
 		case MODE_EFFECT:
 			// If a buffer is not yet flipped
