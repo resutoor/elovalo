@@ -40,6 +40,8 @@ void init_tlc5940(void)
 		(1<<PD2)| // DCPRG: output
 		(1<<PD3)| // VPRG: output
 		(1<<PD4)| // Debug LED: output
+		(1<<PD5)| // Debug LED2: output
+		(1<<PD6)| // Debug LED3: output
 		(1<<PD7); // BLANK: output
 }
 
