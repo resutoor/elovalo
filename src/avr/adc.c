@@ -7,6 +7,10 @@
 #include <avr/wdt.h>
 #include <avr/io.h>
 #include <stdlib.h>
+#include "pinMacros.h" //for DEBUG_LED only
+#include "init.h" //for DEBUG_LED only
+
+
 
 void adc_init()
 {
@@ -33,7 +37,9 @@ uint16_t adc_read(uint8_t ch)
     // wait for conversion to complete
     // ADSC becomes '0' again
     // till then, run loop continuously
+    pin_high(DEBUG_LED2);
     while(ADCSRA & (1<<ADSC));
+    pin_low(DEBUG_LED2);
 
     return (ADC);
 }

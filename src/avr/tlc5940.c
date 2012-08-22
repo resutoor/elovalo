@@ -26,7 +26,9 @@ volatile uint8_t may_flip = 0;
  */
 ISR(SPI_STC_vect)
 {
+    //pin_high(DEBUG_LED3);
 	if(--layer_bytes_left) SPDR = *send_ptr++;
+    //pin_low(DEBUG_LED3);
 }
 
 /*
@@ -37,6 +39,7 @@ ISR(TIMER0_COMPA_vect)
 {
 	static uint8_t layer = 0x01;
 
+    pin_high(DEBUG_LED3);
 	// Main screen turn off
 	pin_high(BLANK);
 
@@ -68,5 +71,6 @@ ISR(TIMER0_COMPA_vect)
 	}
 
 	// Set up byte counter for SPI interrupt
-	layer_bytes_left = BYTES_PER_LAYER + 1;	
+	layer_bytes_left = BYTES_PER_LAYER + 1;
+	pin_low(DEBUG_LED3);
 }

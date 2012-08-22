@@ -91,8 +91,8 @@ int main() {
 			adc_value = adc_read(0);
 			pin_low(DEBUG_LED);
 
-			serial_send((uint8_t)(adc_value>>8));
-			serial_send((uint8_t)adc_value);
+			//serial_send((uint8_t)(adc_value>>8));
+			//serial_send((uint8_t)adc_value);
 			break;
 		case MODE_EFFECT:
 			// If a buffer is not yet flipped
