@@ -12,6 +12,7 @@
 #include <avr/wdt.h>
 #include <avr/io.h>
 #include <stdlib.h>
+//#include <util/delay.h>
 #include "pinMacros.h"
 #include "main.h"
 #include "init.h"
@@ -75,6 +76,7 @@ int main() {
 	initUSART();
 
 	adc_init();
+	adc_start();
 	sei();
 
 	// Greet the serial user
@@ -92,12 +94,14 @@ int main() {
 			// No operation
 
 			pin_high(DEBUG_LED);
-			adc_value = adc_read(0);
+			adc_value = adc_get(1);
 			pin_low(DEBUG_LED);
 
 			//send bytes in little-endian byte order
 			serial_send((uint8_t)adc_value);
 			serial_send((uint8_t)(adc_value>>8));
+
+//			_delay_ms(100);
 			break;
 		case MODE_EFFECT:
 			// If a buffer is not yet flipped
