@@ -10,6 +10,10 @@
 
 void adc_init()
 {
+	// disable digital inputs of ADC0 ... ADC5
+	// see e.g. http://www.openmusiclabs.com/learning/digital/atmega-adc/
+	DIDR0 = 0b00111111;
+
     // AREF = AVcc
     ADMUX = (1<<REFS0);
 
