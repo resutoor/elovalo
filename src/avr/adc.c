@@ -39,5 +39,6 @@ uint16_t adc_read(uint8_t ch)
     // till then, run loop continuously
     while(ADCSRA & (1<<ADSC));
 
-    return (ADC);
+    // ADCL must be read first, see doc8161.pdf Rev. 8161D – 10/09, ch 23.2
+    return (ADCL | (ADCH<<8));
 }
