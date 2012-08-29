@@ -54,6 +54,7 @@ typedef struct {
 uint8_t mode = MODE_IDLE; // Starting with no operation on.
 const effect_t *effect; // Current effect. Note: points to PGM
 
+uint8_t debug_led_state;
 uint16_t adc_value;
 
 // Private functions
@@ -93,13 +94,11 @@ int main() {
 		case MODE_IDLE:
 			// No operation
 
-			pin_high(DEBUG_LED);
 			adc_value = adc_get(1);
-			pin_low(DEBUG_LED);
 
 			//send bytes in little-endian byte order
-			serial_send((uint8_t)adc_value);
-			serial_send((uint8_t)(adc_value>>8));
+			//serial_send((uint8_t)adc_value);
+			//serial_send((uint8_t)(adc_value>>8));
 
 //			_delay_ms(100);
 			break;
@@ -153,6 +152,15 @@ void process_cmd(void)
 		break;
 	case CMD_STOP:
 		mode = MODE_IDLE;
+		if (debug_led_state) {
+			pin_low(DEBUG_LED);
+			debug_led_state = 0;
+		}
+		else {
+			pin_high(DEBUG_LED);
+			debug_led_state = 1;
+		}
+
 		break;
 	case CMD_CHANGE_EFFECT:
 		x = read_escaped();
