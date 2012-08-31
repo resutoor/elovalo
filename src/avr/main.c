@@ -72,7 +72,7 @@ int main() {
 	init_tlc5940();
 	init_spi();
 
-	//init_blank_timer(); //TODO: temporary eliminated because this code is overlapping with hcsr04.c
+	init_blank_timer();
 	hcsr04_init();
 	init_effect_timer();
 
