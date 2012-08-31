@@ -69,6 +69,7 @@ ISR(SPI_STC_vect)
 }
 #endif
 
+#if 0 //TODO: temporary eliminated because this code is overlapping with hcsr04.c
 /*
  * BLANK timer interrupt Timer0
  * Interrupt if TCNT0 = OCR0A
@@ -110,3 +111,4 @@ ISR(TIMER0_COMPA_vect)
 	// Set up byte counter for SPI interrupt
 	layer_bytes_left = BYTES_PER_LAYER + 1;
 }
+#endif

@@ -16,6 +16,7 @@
 #include "main.h"
 #include "init.h"
 #include "tlc5940.h"
+#include "hcsr04.h"
 #include "serial.h"
 #include "timer.h"
 #include "../pgmspace.h"
@@ -71,7 +72,8 @@ int main() {
 	init_tlc5940();
 	init_spi();
 
-	init_blank_timer();
+	//init_blank_timer(); //TODO: temporary eliminated because this code is overlapping with hcsr04.c
+	hcsr04_init();
 	init_effect_timer();
 
 	initUSART();
@@ -143,6 +145,14 @@ void process_cmd(void)
 		break;
 	case CMD_STOP:
 		mode = MODE_IDLE;
+		uint32_t pulse_time = hcsr04_get_pulse_time();
+
+		serial_send(pulse_time >> 24);
+		serial_send(pulse_time >> 16);
+		serial_send(pulse_time >> 8);
+		serial_send(pulse_time);
+
+		hcsr04_send_pulse();
 		break;
 	case CMD_CHANGE_EFFECT:
 		x = read_escaped();
