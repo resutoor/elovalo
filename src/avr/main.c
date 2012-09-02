@@ -125,6 +125,8 @@ int main() {
 	return 0;
 }
 
+extern uint16_t debug_tcnt1;
+
 /**
  * Processes a command. The escape character is already read in
  * main(). This function may block because of reading serial data, but
@@ -145,13 +147,12 @@ void process_cmd(void)
 		break;
 	case CMD_STOP:
 		mode = MODE_IDLE;
-		uint32_t pulse_time = hcsr04_get_pulse_time();
+		uint16_t distance = hcsr04_get_pulse_length();
 
-		serial_send(pulse_time >> 24);
-		serial_send(pulse_time >> 16);
-		serial_send(pulse_time >> 8);
-		serial_send(pulse_time);
+		serial_send(distance >> 8);
+		serial_send(distance);
 
+		//start the next measurement
 		hcsr04_send_pulse();
 		break;
 	case CMD_CHANGE_EFFECT:
