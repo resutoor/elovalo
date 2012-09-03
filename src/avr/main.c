@@ -17,6 +17,7 @@
 #include "init.h"
 #include "tlc5940.h"
 #include "hcsr04.h"
+#include "adc.h"
 #include "serial.h"
 #include "timer.h"
 #include "../pgmspace.h"
@@ -74,6 +75,7 @@ int main() {
 
 	init_blank_timer();
 	hcsr04_init();
+	adc_start();
 	init_effect_timer();
 
 	initUSART();
@@ -147,6 +149,9 @@ void process_cmd(void)
 		break;
 	case CMD_STOP:
 		mode = MODE_IDLE;
+		break;
+	case 0x20:
+		;
 		uint16_t distance = hcsr04_get_pulse_length();
 
 		serial_send(distance >> 8);
@@ -154,6 +159,16 @@ void process_cmd(void)
 
 		//start the next measurement
 		hcsr04_send_pulse();
+		break;
+	case 0x21:
+		;
+		uint16_t adc_value = adc_get(0);
+		serial_send((uint8_t)adc_value);
+		serial_send((uint8_t)(adc_value>>8));
+
+		adc_value = adc_get(1);
+		serial_send((uint8_t)adc_value);
+		serial_send((uint8_t)(adc_value>>8));
 		break;
 	case CMD_CHANGE_EFFECT:
 		x = read_escaped();
