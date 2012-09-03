@@ -125,7 +125,7 @@ int main() {
 	return 0;
 }
 
-extern uint16_t debug_tcnt1;
+
 
 /**
  * Processes a command. The escape character is already read in
