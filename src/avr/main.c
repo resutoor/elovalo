@@ -18,6 +18,7 @@
 #include "tlc5940.h"
 #include "serial.h"
 #include "timer.h"
+#include "hcsr04.h"
 #include "../pgmspace.h"
 #include "../cube.h"
 #include "../effects.h"
@@ -145,6 +146,22 @@ void process_cmd(void)
 		break;
 	case CMD_STOP:
 		mode = MODE_IDLE;
+		break;
+	case 0x20:
+		serial_send(hcsr04_start_continuous_meas());
+		break;
+	case 0x21:
+		hcsr04_stop_continuous_meas();
+		serial_send(0x01);
+		break;
+	case 0x22:
+		;
+		uint16_t ret_val = hcsr04_get_pulse_length();
+		serial_send(ret_val >> 8);
+		serial_send(ret_val);
+		ret_val = hcsr04_get_distance_in_cm();
+		serial_send(ret_val >> 8);
+		serial_send(ret_val);
 		break;
 	case CMD_CHANGE_EFFECT:
 		x = read_escaped();
