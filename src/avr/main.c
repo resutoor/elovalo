@@ -16,6 +16,7 @@
 #include "main.h"
 #include "init.h"
 #include "tlc5940.h"
+#include "adc.h"
 #include "serial.h"
 #include "timer.h"
 #include "hcsr04.h"
@@ -78,6 +79,7 @@ int main() {
 	init_effect_timer();
 
 	initUSART();
+	adc_start();
 	sei();
 
 	// Greet the serial user
@@ -94,6 +96,10 @@ int main() {
 		switch (mode) {
 		case MODE_IDLE:
 			// No operation
+			;
+			uint16_t adc_result = adc_get(0);
+			serial_send(adc_result>>8);
+			serial_send(adc_result);
 			break;
 		case MODE_EFFECT: // TODO: playlist logic
 			// If a buffer is not yet flipped
@@ -162,6 +168,10 @@ void process_cmd(void)
 		ret_val = hcsr04_get_distance_in_cm();
 		serial_send(ret_val >> 8);
 		serial_send(ret_val);
+		break;
+	case 0x30:
+		adc_get(0);
+		serial_send(0x01);
 		break;
 	case CMD_CHANGE_EFFECT:
 		x = read_escaped();
