@@ -11,7 +11,7 @@
  * NOTE! This is for testing purposes, use hcsr04_start_continuous_meas() instead
  * TODO: to be removed
  */
-int hcsr04_send_pulse(void);
+int hcsr04_send_pulse(uint8_t sensor);
 
 /**
  * Starts the continuous measurement mode.
@@ -29,12 +29,12 @@ void hcsr04_stop_continuous_meas(void);
  * or HCSR04_MEAS_FAIL on failure.
  */
 #define HCSR04_MEAS_FAIL 0xFFFF
-uint16_t hcsr04_get_pulse_length(void);
+uint16_t hcsr04_get_pulse_length(uint8_t sensor);
 
 /**
  * Returns the result of the latest measurement cycle in cm,
  * or HCSR04_MEAS_FAIL on failure.
  */
-uint16_t hcsr04_get_distance_in_cm(void);
+uint16_t hcsr04_get_distance_in_cm(uint8_t sensor);
 
 #endif /* HCSR04_H_ */
