@@ -105,7 +105,8 @@ int main() {
 
 			// TODO: get length from playlist item
 			ticks = centisecs();
-			if (ticks > 1000) {
+			if (0) { //Temp hack to make effects last forever 
+			//if (ticks > 1000) {
 				// Rendered too long, stop.
 				mode = MODE_IDLE;
 
