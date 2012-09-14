@@ -106,10 +106,10 @@ void my_init_stack (void) {
 
 	debug1 = (void*)((SPH<<8) + SPL);
 	stack_area_p = (uint8_t*)((SPH<<8) + SPL) + 4; //TODO: check this
-	while (stack_area_p >= (uint8_t*)__heap_start) {
-		*stack_area_p = STACK_INIT_PATTERN;
-		stack_area_p --;
-	}
+//	while (stack_area_p >= (uint8_t*)__heap_start) {
+//		*stack_area_p = STACK_INIT_PATTERN;
+//		stack_area_p --;
+//	}
 }
 
 void *my_check_stack_watermark (void) {
@@ -117,7 +117,7 @@ void *my_check_stack_watermark (void) {
 	register uint8_t *current_stack_p;
 
 	current_stack_p = (uint8_t*)((SPH<<8) + SPL);
-	stack_area_p = (uint8_t*)__heap_start;
+	stack_area_p = (uint8_t*)&__heap_start;
 	while (stack_area_p <= current_stack_p) {
 		if (*stack_area_p != STACK_INIT_PATTERN) {
 			return (void*)stack_area_p;
@@ -161,17 +161,21 @@ int main() {
 			break;
 		case 0x30:
 			;
-			uint32_t test1 = (uint32_t)__heap_start;
-			serial_send(test1>>24);
+			uint32_t test1 = (uint32_t)&__heap_start;
+			//serial_send(test1>>24);
+			serial_send(0x55);
 			serial_send(test1>>16);
 			serial_send(test1>>8);
 			serial_send(test1);
 			//serial_send(__builtin_frame_address(0));
-			uint16_t test2 = (uint16_t)my_check_stack_watermark();
-			//serial_send(test2>>24);
-			//serial_send(test2>>16);
+			//uint16_t test2 = (uint16_t)my_check_stack_watermark();
+			uint16_t test2 = (uint16_t)&test1;
 			serial_send(test2>>8);
 			serial_send(test2);
+			uint16_t test3 = (uint16_t)((SPH<<8) + SPL);
+			serial_send(test3>>8);
+			serial_send(test3);
+			mode = MODE_IDLE;
 			break;
 		case MODE_EFFECT: // TODO: playlist logic
 			// If a buffer is not yet flipped
@@ -352,6 +356,9 @@ void process_cmd(void)
 			}
 		}
 		truncate_crontab(i); // Truncate crontab to data length
+	} ELSEIFCMD(0x30) {
+		mode = 0x30;
+		return;
 	} else {
 		report(REPORT_INVALID_CMD);
 		return;
