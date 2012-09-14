@@ -95,6 +95,39 @@ static void report(uint8_t code);
 static bool answering(void);
 static void send_string_from_pgm(const char * const* pgm_p);
 
+extern int  __heap_start;
+
+void *debug1;
+#define STACK_INIT_PATTERN 0xa5
+
+void my_init_stack (void) __attribute__ ((naked)) __attribute__ ((section (".init2")));
+void my_init_stack (void) {
+	uint8_t *stack_area_p;
+
+	debug1 = (void*)((SPH<<8) + SPL);
+	stack_area_p = (uint8_t*)((SPH<<8) + SPL) + 4; //TODO: check this
+	while (stack_area_p >= (uint8_t*)__heap_start) {
+		*stack_area_p = STACK_INIT_PATTERN;
+		stack_area_p --;
+	}
+}
+
+void *my_check_stack_watermark (void) {
+	register uint8_t *stack_area_p;
+	register uint8_t *current_stack_p;
+
+	current_stack_p = (uint8_t*)((SPH<<8) + SPL);
+	stack_area_p = (uint8_t*)__heap_start;
+	while (stack_area_p <= current_stack_p) {
+		if (*stack_area_p != STACK_INIT_PATTERN) {
+			return (void*)stack_area_p;
+			break;
+		}
+		stack_area_p ++;
+	}
+	return NULL;
+}
+
 int main() {
 	cli();
 
@@ -125,6 +158,20 @@ int main() {
 		switch (mode) {
 		case MODE_IDLE:
 			// No operation
+			break;
+		case 0x30:
+			;
+			uint32_t test1 = (uint32_t)__heap_start;
+			serial_send(test1>>24);
+			serial_send(test1>>16);
+			serial_send(test1>>8);
+			serial_send(test1);
+			//serial_send(__builtin_frame_address(0));
+			uint16_t test2 = (uint16_t)my_check_stack_watermark();
+			//serial_send(test2>>24);
+			//serial_send(test2>>16);
+			serial_send(test2>>8);
+			serial_send(test2);
 			break;
 		case MODE_EFFECT: // TODO: playlist logic
 			// If a buffer is not yet flipped
