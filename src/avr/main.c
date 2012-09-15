@@ -61,6 +61,9 @@ typedef struct {
 uint8_t mode = MODE_IDLE; // Starting with no operation on.
 const effect_t *effect; // Current effect. Note: points to PGM
 
+uint16_t debug1;
+uint16_t debug2;
+
 // Private functions
 void process_cmd(void);
 void send_escaped(uint8_t byte);
@@ -121,6 +124,12 @@ int main() {
 			sensors.ambient_light = adc_get(0) >> 2;
 			sensors.sound_pressure_level = adc_get(1) >> 2;
 
+			debug1++;
+			if (debug1 >= 200) {
+				//serial_send(sensors.distance1);
+				//serial_send(sensors.ambient_light);
+			}
+
 			// Do the actual drawing
 			draw_t draw = (draw_t)pgm_get(effect->draw,word);
 			if (draw != NULL) {
@@ -156,6 +165,13 @@ void process_cmd(void)
 		break;
 	case CMD_STOP:
 		mode = MODE_IDLE;
+		sensors.distance1 = hcsr04_get_distance_in_cm();
+		sensors.distance2 = hcsr04_get_distance_in_cm(); //TODO: use separate sensor
+		sensors.ambient_light = adc_get(0) >> 2;
+		sensors.sound_pressure_level = adc_get(1) >> 2;
+		serial_send(sensors.distance1);
+		serial_send(sensors.ambient_light);
+		serial_send(sensors.sound_pressure_level);
 		break;
 	case CMD_CHANGE_EFFECT:
 		x = read_escaped();
