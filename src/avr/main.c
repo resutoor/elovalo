@@ -97,6 +97,31 @@ static bool answering(void);
 static void send_string_from_pgm(const char * const* pgm_p);
 
 uint8_t *debug1;
+uint16_t debug2;
+
+uint16_t eat_stack(uint16_t count) {
+#if 0
+	#define ASIZE 0x120
+	uint8_t test_array[ASIZE];
+	int ii;
+
+	for (ii = 0; ii < ASIZE; ii ++){
+		test_array[ii] = ii;
+		debug2++;
+	}
+	debug2 = (uint16_t)&(test_array[0]);
+
+	if (test_array[0] != test_array[ASIZE-1])
+		test_array[0]++;
+
+	return (uint16_t)test_array[0];
+#else
+
+	if (count > 0)
+		eat_stack(--count);
+	return count;
+#endif
+}
 
 int main() {
 	cli();
@@ -137,15 +162,25 @@ int main() {
 			serial_send(0x55);
 			//serial_send(__builtin_frame_address(0));
 			uint16_t test2 = (uint16_t)debug_get_unused_stack();
-			//uint16_t test2 = (uint16_t)&test1;
 			serial_send(test2>>8);
 			serial_send(test2);
-			uint16_t test3 = (uint16_t)((SPH<<8) + SPL);
-			serial_send(test3>>8);
-			serial_send(test3);
-			uint8_t test4 = *(uint8_t*)((SPH<<8) + SPL + 0x10);
-			serial_send(test4);
+			eat_stack(50);
+			test2 = (uint16_t)debug_get_unused_stack();
+			serial_send(test2>>8);
+			serial_send(test2);
+			serial_send(debug2>>8);
+			serial_send(debug2);
 			mode = MODE_IDLE;
+
+			uint8_t *stack_area_p;
+			extern int  __heap_start;
+			stack_area_p = (uint8_t*)&__heap_start;
+			serial_send(((uint16_t)stack_area_p)>>8);
+			serial_send((uint16_t)stack_area_p);
+			debug1 = (uint8_t*)debug2;
+			serial_send(*debug1);
+			serial_send(*(debug1-1));
+
 			break;
 		case MODE_EFFECT: // TODO: playlist logic
 			// If a buffer is not yet flipped
