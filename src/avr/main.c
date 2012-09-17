@@ -31,6 +31,7 @@
 #include "clock.h"
 #include "configuration.h"
 #include "powersave.h"
+#include "debug.h"
 #include "../pgmspace.h"
 #include "../cube.h"
 #include "../effects.h"
@@ -101,6 +102,7 @@ int main() {
 	cli();
 
 	wdt_disable(); // To make sure nothing weird happens
+	debug_fill_stack_area();
 	init_tlc5940();
 	init_spi();
 	init_ps();
