@@ -55,6 +55,7 @@
 #define CMD_READ_CRONTAB    'c'
 #define CMD_WRITE_CRONTAB   'C'
 #define CMD_SELECT_PLAYLIST 'P'
+#define CMD_GET_DEBUG_INFO  'd'
 #define CMD_NOTHING         '*' // May be used to end binary transmission
 
 // Autonomous responses. These may occur anywhere, anytime
@@ -320,6 +321,9 @@ void process_cmd(void)
 		 * is truncated to the length of first valid
 		 * entries. */
 		truncate_crontab(i);
+	} ELSEIFCMD(CMD_GET_DEBUG_INFO) {
+		uint16_t unused_stack_size = debug_get_unused_stack();
+		sram_to_serial(&unused_stack_size,sizeof(unused_stack_size));
 	} else {
 		report(REPORT_INVALID_CMD);
 		return;
